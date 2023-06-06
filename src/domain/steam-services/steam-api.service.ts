@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadGatewayException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, catchError } from 'rxjs';
 
 import ISteamUser from 'interfaces/ISteamUser';
 
@@ -8,30 +12,25 @@ import { steamUserMapper } from 'mappers/steamUserMapper';
 import { steamStatsMapper } from 'mappers/steamStatsMapper';
 import { steamLinks } from 'utils/steamLinks';
 
-const { baseURL, steamStats, steamUsers, steamLevel, steamFriends } =
-  steamLinks;
+const { steamStats, steamUsers, steamLevel, steamFriends } = steamLinks;
 
 @Injectable()
 export class SteamApiService {
   constructor(private readonly http: HttpService) {}
 
-  async getUserData(id: number): Promise<ISteamUser> {
-    const { STEAM_KEY, GAME_ID_CS } = process.env;
-
+  async getUserData(id: string): Promise<ISteamUser> {
     const foundUsers = await firstValueFrom(
-      this.http.get(
-        `${baseURL}/${steamUsers}?key=${STEAM_KEY}&appid=${GAME_ID_CS}&steamids=${id}`,
-      ),
+      this.http.get(`/${steamUsers}?steamids=${id}`),
     );
 
     const foundPlayer = foundUsers.data.response.players.find(
       ({ steamid }) => steamid === id,
     );
 
-    if (!foundPlayer) return null;
+    if (!foundPlayer) throw new NotFoundException();
 
     const foundLevel = await firstValueFrom(
-      this.http.get(`${baseURL}/${steamLevel}?key=${STEAM_KEY}&steamid=${id}`),
+      this.http.get(`/${steamLevel}?steamid=${id}`),
     );
 
     let mappedPlayer = steamUserMapper(foundPlayer);
@@ -43,12 +42,15 @@ export class SteamApiService {
     return player;
   }
 
-  async getUserStats(id: string, game: string) {
-    const { STEAM_KEY, GAME_ID_CS } = process.env;
-
+  async getUserStats(id: string) {
     const foundStats = await firstValueFrom(
-      this.http.get(
-        `${baseURL}/${steamStats}?key=${STEAM_KEY}&appid=${GAME_ID_CS}&steamid=${id}`,
+      this.http.get(`/${steamStats}?steamid=${id}`).pipe(
+        catchError((err) => {
+          throw new BadGatewayException(
+            'Steam API is not avaliable',
+            err.response.data,
+          );
+        }),
       ),
     );
 
@@ -58,12 +60,8 @@ export class SteamApiService {
   }
 
   async getUserFriends(id: string): Promise<ISteamUser[]> {
-    const { STEAM_KEY, GAME_ID_CS } = process.env;
-
     const foundFriendsList = await firstValueFrom(
-      this.http.get(
-        `${baseURL}/${steamFriends}?key=${STEAM_KEY}&steamid=${id}`,
-      ),
+      this.http.get(`/${steamFriends}?steamid=${id}`),
     );
 
     const mappedFriendsList = foundFriendsList.data.friendslist.friends
@@ -71,9 +69,7 @@ export class SteamApiService {
       .join(',');
 
     const friends = await firstValueFrom(
-      this.http.get(
-        `${baseURL}/${steamUsers}?key=${STEAM_KEY}&appid=${GAME_ID_CS}&steamids=${mappedFriendsList}`,
-      ),
+      this.http.get(`/${steamUsers}?steamids=${mappedFriendsList}`),
     );
 
     const mappedFriends = friends.data.response.players.map((player) =>

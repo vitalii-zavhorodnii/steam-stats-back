@@ -1,4 +1,6 @@
-export const steamUserMapper = (profile: any) => ({
+import ISteamUser from 'interfaces/ISteamUser';
+
+export const steamUserMapper = (profile: any): ISteamUser => ({
   name: profile.personaname,
   steamId: profile.steamid,
   steamUrl: profile.profileurl,

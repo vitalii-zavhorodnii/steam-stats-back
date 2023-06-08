@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 
 import { AppModule } from './app.module';
 
@@ -11,5 +12,8 @@ import { AppModule } from './app.module';
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ? parseInt(process.env.PORT) : 4000);
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('port');
+
+  await app.listen(port || 4000);
 })();

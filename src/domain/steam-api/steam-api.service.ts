@@ -6,11 +6,15 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom, catchError } from 'rxjs';
 
-import ISteamUser from 'interfaces/ISteamUser';
-
 import { steamUserMapper } from 'mappers/steamUserMapper';
 import { steamStatsMapper } from 'mappers/steamStatsMapper';
-import { steamLinks } from 'utils/steamLinks';
+const steamLinks = {
+  steamStats: 'ISteamUserStats/GetUserStatsForGame/v2',
+  steamUsers: 'ISteamUser/GetPlayerSummaries/v0002',
+  steamLevel: 'IPlayerService/GetSteamLevel/v1',
+  steamBadges: 'IPlayerService/GetBadges/v1',
+  steamFriends: 'ISteamUser/GetFriendList/v0001',
+};
 
 const { steamStats, steamUsers, steamLevel, steamFriends } = steamLinks;
 
@@ -18,7 +22,7 @@ const { steamStats, steamUsers, steamLevel, steamFriends } = steamLinks;
 export class SteamApiService {
   constructor(private readonly http: HttpService) {}
 
-  async getUserData(id: string): Promise<ISteamUser> {
+  async getProfileById(id: string) {
     const foundUsers = await firstValueFrom(
       this.http.get(`/${steamUsers}?steamids=${id}`),
     );
@@ -59,7 +63,7 @@ export class SteamApiService {
     return result;
   }
 
-  async getUserFriends(id: string): Promise<ISteamUser[]> {
+  async getUserFriends(id: string) {
     const foundFriendsList = await firstValueFrom(
       this.http.get(`/${steamFriends}?steamid=${id}`),
     );

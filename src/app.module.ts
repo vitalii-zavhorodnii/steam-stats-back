@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { SteamApiModule } from './domain/steam-services/steam-api.module';
+import { TrnApiModule } from 'domain/trn-api/trn-api.module';
+import { ProfilesModule } from './domain/profiles/profiles.module';
+import { SteamApiModule } from './domain/steam-api/steam-api.module';
 
 import configuration from 'config/configuration';
 
 @Module({
-  controllers: [],
-  providers: [],
   imports: [
+    TrnApiModule,
+    ProfilesModule,
     SteamApiModule,
     ConfigModule.forRoot({
       isGlobal: true,

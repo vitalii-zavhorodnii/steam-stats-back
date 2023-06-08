@@ -1,11 +1,12 @@
 export default () => ({
   port: parseInt(process.env.PORT) || 4000,
-  steamservice: {
+  steamapi: {
     baseUrl: process.env.STEAM_API_URL,
-    key: process.env.STEAM_KEY,
-    gamekeys: {
-      csgo: process.env.GAME_ID_CS,
-      dota: process.env.GAME_ID_DOTA,
-    },
+    key: process.env.STEAM_API_KEY,
+  },
+  trnapi: {
+    baseUrl: process.env.TRN_API_URL,
+    headerKey: process.env.TRN_API_HEADER,
+    headerValue: process.env.TRN_API_KEY,
   },
 });

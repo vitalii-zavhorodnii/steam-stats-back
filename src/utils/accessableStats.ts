@@ -7,7 +7,7 @@ export const accessableStats = [
   { code: 'total_mvps', title: 'Total MVPs' },
   { code: 'total_matches_won', title: 'Total wins' },
   { code: 'total_matches_played', title: 'Total matches' },
-
+  
   { code: 'last_match_kills', title: 'Last match kills' },
   { code: 'last_match_deaths', title: 'Last match deaths' },
   { code: 'last_match_mvps', title: 'Last match MVPs' },

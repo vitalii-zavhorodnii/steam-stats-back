@@ -37,10 +37,8 @@ export class SteamApiService {
       this.http.get(`/${steamLevel}?steamid=${id}`),
     );
 
-    let mappedPlayer = steamUserMapper(foundPlayer);
-
     const player = {
-      ...mappedPlayer,
+      ...foundPlayer,
       level: foundLevel.data.response.player_level,
     };
     return player;

@@ -12,7 +12,6 @@ export class TrnApiService {
   constructor(private readonly http: HttpService) {}
 
   async getSteamUserByQuery(query: string) {
-    console.log({ query });
     const {
       data: { data: steamUsers },
     } = await firstValueFrom(
@@ -46,5 +45,21 @@ export class TrnApiService {
     if (!player) throw new NotFoundException('Player was not found');
 
     return player;
+  }
+
+  async getStatsBySegment(id: string, segment: string) {
+    const { data } = await firstValueFrom(
+      this.http
+        .get(`/csgo/standard/profile/steam/${id}/segments/${segment}`)
+        .pipe(
+          catchError((e) => {
+            throw new BadRequestException(e.response.data, e.response.status);
+          }),
+        ),
+    );
+
+    if (data.length === 0) throw new BadRequestException('No data was found!');
+
+    return data;
   }
 }

@@ -14,9 +14,26 @@ export class ProfilesService {
     const steamID = await this.trnApiService.getSteamUserByQuery(query);
     const steamProfile = await this.steamApiService.getProfileById(steamID);
     const trnProfile = await this.trnApiService.getProfileById(steamID);
+    const weaponProfile = await this.trnApiService.getStatsBySegment(
+      steamID,
+      'weapon',
+    );
 
-    console.log({ steamProfile });
+    const steamData = (steamData: any, trnData: any) => ({
+      profile: {
+        id: steamData.id,
+        name: steamData.personaname,
+        level: steamData.level,
+        picture: steamData.avatarfull,
+        steamUrl: steamData.profileurl,
+        lastTimePlayedStamp: steamData.lastlogoff,
+        createStamp: steamData.timecreated,
+      },
+      overallStats: {
+        timePlayed: trnData.segments,
+      },
+    });
 
-    return trnProfile;
+    return weaponProfile;
   }
 }

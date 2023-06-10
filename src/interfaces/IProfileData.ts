@@ -1,12 +1,18 @@
+import IProfileWeaponsStats from './IProfileWeaponsStats';
+
 interface IProfileData {
-  name: string;
-  steamId: string;
-  steamUrl: string;
-  picture: string;
-  countryCode: string;
-  level: number;
-  cityCode: string;
-  createdTimeStamp: number;
+  profile: {
+    id: string;
+    name: string;
+    level: number;
+    picture: string;
+    steamUrl: string;
+    lastTimePlayedStamp: number;
+    createStamp: number;
+  };
+  stats?: {
+    weapons: IProfileWeaponsStats[];
+  };
 }
 
 export default IProfileData;
